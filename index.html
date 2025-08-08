@@ -1,63 +1,316 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TradingPiView - Real-Time Advanced Dashboard</title>
-<link rel="stylesheet" href="style.css" />
-</head>
-<body>
-<header>
-  <div class="logo">
-    <img src="logo.png" alt="TradingPiView Logo" />
-    <h1>TradingPiView</h1>
-  </div>
-  <nav>
-    <button id="wallet-connect-btn">Connect Wallet</button>
-  </nav>
-</header>
+body {
+  background: #0d1117;
+  color: #c9d1d9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-<main>
-  <section class="price-section">
-    <h2>Live Price: <span id="symbol">BTC/USDT</span></h2>
-    <div class="price-display">
-      <span id="live-price">$0.00</span>
-      <span id="price-change" class="neutral">+0.00%</span>
-    </div>
+header {
+  background: #161b22;
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #30363d;
+}
 
-    <div class="tp-sl-inputs">
-      <label>
-        Take Profit ($):
-        <input type="number" id="take-profit" step="0.01" placeholder="e.g. 30000" />
-      </label>
-      <label>
-        Stop Loss ($):
-        <input type="number" id="stop-loss" step="0.01" placeholder="e.g. 28000" />
-      </label>
-      <button id="set-alerts-btn">Set Alerts</button>
-    </div>
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
-    <p id="alert-msg"></p>
-  </section>
+.logo img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
 
-  <section class="order-book-section">
-    <h3>Order Book Depth</h3>
-    <div id="order-book">
-      <div id="bids"></div>
-      <div id="asks"></div>
-    </div>
-  </section>
+nav button {
+  background: #238636;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 1rem;
+}
 
-  <section class="trades-section">
-    <h3>Recent Trades</h3>
-    <ul id="trades-list"></ul>
-  </section>
-</main>
+nav button:hover {
+  background: #2ea043;
+}
 
-<footer>
-  <p>© 2025 TradingPiView | Real-Time Dashboard</p>
-</footer>
+main {
+  max-width: 1200px;
+  margin: 2rem auto 3rem;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem 3rem;
+  row-gap: 2.5rem;
+}
 
-<script src="app.js"></script>
-</body>
-</html>
+.price-section {
+  background: #161b22;
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  grid-column: 1 / 2;
+  box-shadow: 0 0 10px rgb(35 134 54 / 0.3);
+}
+
+.price-section h2 {
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin-bottom: 0.6rem;
+  color: #c9d1d9;
+}
+
+.price-display {
+  font-size: 4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  color: #c9d1d9;
+  user-select: none;
+}
+
+#price-change.positive {
+  color: #2ea043;
+}
+
+#price-change.negative {
+  color: #f85149;
+}
+
+#price-change.neutral {
+  color: #8b949e;
+}
+
+.tp-sl-inputs {
+  margin-top: 2rem;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.tp-sl-inputs label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #8b949e;
+  font-size: 1rem;
+}
+
+.tp-sl-inputs input {
+  margin-top: 0.4rem;
+  background: #0d1117;
+  border: 2px solid #30363d;
+  color: #c9d1d9;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: border-color 0.3s ease;
+}
+
+.tp-sl-inputs input:focus {
+  outline: none;
+  border-color: #238636;
+  background: #121a15;
+}
+
+.tp-sl-inputs button {
+  background: #238636;
+  border: none;
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  align-self: flex-end;
+  transition: background 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.tp-sl-inputs button:hover {
+  background: #2ea043;
+}
+
+#alert-msg {
+  margin-top: 1.2rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-height: 1.5em;
+  user-select: none;
+}
+
+.order-book-section {
+  background: #161b22;
+  border-radius: 12px;
+  padding: 1.8rem 2rem;
+  grid-column: 2 / 3;
+  box-shadow: 0 0 10px rgb(248 81 73 / 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.order-book-section h3 {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #c9d1d9;
+  user-select: none;
+}
+
+#order-book {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 320px;
+}
+
+#order-book > div {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.9rem;
+  background: #0d1117;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 0.5rem 1rem;
+  color: #c9d1d9;
+  user-select: text;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  box-shadow: inset 0 0 10px rgba(35, 134, 54, 0.1);
+}
+
+#bids > div:hover {
+  background: rgba(46, 160, 67, 0.15);
+}
+
+#asks > div:hover {
+  background: rgba(248, 81, 73, 0.15);
+}
+
+#bids .price {
+  color: #2ea043;
+  font-weight: 700;
+}
+
+#asks .price {
+  color: #f85149;
+  font-weight: 700;
+}
+
+.trades-section {
+  background: #161b22;
+  border-radius: 12px;
+  padding: 1.8rem 2rem;
+  grid-column: 1 / 3;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #c9d1d9;
+  margin-top: 2rem;
+  box-shadow: 0 0 10px rgb(35 134 54 / 0.3);
+  user-select: none;
+}
+
+.trades-section h3 {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  user-select: none;
+}
+
+.trades-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.trade-buy {
+  color: #2ea043;
+  font-weight: 600;
+}
+
+.trade-sell {
+  color: #f85149;
+  font-weight: 600;
+}
+
+.chart-section {
+  grid-column: 1 / 3;
+  margin-top: 3rem;
+  background: #161b22;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 0 20px rgb(35 134 54 / 0.4);
+  user-select: none;
+}
+
+.chart-controls {
+  margin-top: 0.7rem;
+  color: #8b949e;
+  display: flex;
+  gap: 1.2rem;
+  user-select: none;
+}
+
+.chart-controls label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.chart-controls select {
+  margin-top: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  background: #0d1117;
+  border: 2px solid #30363d;
+  color: #c9d1d9;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.chart-controls select:hover,
+.chart-controls select:focus {
+  outline: none;
+  border-color: #238636;
+}
+
+footer {
+  background: #161b22;
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 1rem;
+  border-top: 1px solid #30363d;
+  color: #8b949e;
+  user-select: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+    padding: 1rem 1.5rem;
+  }
+  .order-book-section,
+  .price-section,
+  .trades-section,
+  .chart-section {
+    grid-column: 1 / 2;
+  }
+}

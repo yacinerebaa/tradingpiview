@@ -3,58 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingPiView</title>
-    <link rel="stylesheet" href="./style.css">
-
-    <!-- TradingView Widget Script -->
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <title>TradingPiView - Web3 Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <div class="navbar">
-        <h1>TradingPiView</h1>
-        <button id="login-btn">Login</button>
-    </div>
-
-    <!-- Main Container -->
-    <div class="container">
-        
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h2>Assets</h2>
-            <ul id="asset-list">
-                <li>Pi <span id="asset-price">Loading...</span></li>
-                <div>
-  Pi Price: <span id="asset-price">Loading...</span>
-                </div>
-                <li>BTC</li>
-                <li>ETH</li>
-                <li>BNB</li>
-                <li>XRP</li>
-                <li>SOL</li>
-                <li>ADA</li>
-                <li>DOGE</li>
-            </ul>
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="TradingPiView Logo">
+            <h1>TradingPiView</h1>
         </div>
+        <nav>
+            <button id="login-btn">Log In</button>
+            <button id="signup-btn">Sign Up</button>
+            <button id="logout-btn" style="display:none;">Log Out</button>
+        </nav>
+    </header>
 
-        <!-- Chart Section -->
-        <div class="chart-section">
+    <!-- MAIN DASHBOARD -->
+    <main>
+        <section class="price-section">
+            <h2>Live Pi Price</h2>
+            <p id="asset-price">$0.0000</p>
+        </section>
+
+        <section class="chart-section">
             <div id="chart"></div>
-            <div id="timeframes">
-                <button>1m</button>
-                <button>5m</button>
-                <button>15m</button>
-                <button>1h</button>
-                <button>4h</button>
-                <button>1d</button>
-            </div>
-        </div>
+        </section>
 
-    </div>
+        <section class="timeframes">
+            <button>1m</button>
+            <button>5m</button>
+            <button>15m</button>
+            <button>1h</button>
+            <button>4h</button>
+            <button>1d</button>
+        </section>
+    </main>
 
-    <!-- App Script -->
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script src="./app.js"></script>
+    <footer>
+        <p>© 2025 TradingPiView | Built for Pi Network</p>
+    </footer>
+
+    <script src="app.js"></script>
 </body>
 </html>

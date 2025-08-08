@@ -1,0 +1,111 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0e0e0e;
+    color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+header {
+    background-color: #131722;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #2a2e39;
+}
+
+header h1 {
+    font-size: 1.2rem;
+    color: #fbc531;
+}
+
+#price-container {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#asset-price {
+    color: #00ff88;
+}
+
+#login-btn {
+    background-color: #fbc531;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+#login-btn:hover {
+    background-color: #e1aa2f;
+}
+
+/* Timeframes */
+#timeframes {
+    display: flex;
+    justify-content: center;
+    background-color: #131722;
+    padding: 10px;
+    border-bottom: 1px solid #2a2e39;
+}
+
+#timeframes button {
+    background-color: transparent;
+    border: 1px solid #2a2e39;
+    color: #f5f5f5;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
+#timeframes button:hover {
+    background-color: #2a2e39;
+}
+
+/* Chart Area */
+#chart {
+    flex: 1;
+    background-color: #0e0e0e;
+}
+
+/* Indicators Section */
+#indicators {
+    padding: 15px;
+    background-color: #131722;
+    border-top: 1px solid #2a2e39;
+}
+
+#indicators h2 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+#indicators label {
+    margin-right: 15px;
+    font-size: 0.9rem;
+}
+
+/* Footer */
+footer {
+    background-color: #131722;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.8rem;
+    border-top: 1px solid #2a2e39;
+    color: #888;
+}

@@ -53,3 +53,17 @@ document.querySelectorAll("#timeframes button").forEach(btn => {
 document.getElementById("login-btn").addEventListener("click", () => {
     alert("Login feature coming soon in Pi Browser version!");
 });
+// --- Live Pi Price with CoinGecko ---
+async function fetchPiPrice() {
+  try {
+    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=pi-network&vs_currencies=usd&include_24hr_change=true");
+    const data = await res.json();
+    const piPrice = data["pi-network"].usd.toFixed(4);
+    document.getElementById("asset-price").textContent = `$${piPrice}`;
+  } catch (err) {
+    console.error("Error fetching Pi price:", err);
+    document.getElementById("asset-price").textContent = "N/A";
+  }
+}
+setInterval(fetchPiPrice, 10000);
+fetchPiPrice();

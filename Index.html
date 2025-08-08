@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingPiView</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <h1>📈 TradingPiView</h1>
+        <div id="price-container">
+            <span id="asset-name">Pi</span>: 
+            <span id="asset-price">$0.00</span>
+        </div>
+        <button id="login-btn">🔑 Sign in with Pi Wallet</button>
+    </header>
+
+    <main>
+        <div id="timeframes">
+            <button data-timeframe="1m">1m</button>
+            <button data-timeframe="5m">5m</button>
+            <button data-timeframe="15m">15m</button>
+            <button data-timeframe="1h">1h</button>
+            <button data-timeframe="4h">4h</button>
+            <button data-timeframe="1d">1D</button>
+            <button data-timeframe="1w">1W</button>
+            <button data-timeframe="1M">1M</button>
+        </div>
+        
+        <div id="chart"></div>
+
+        <section id="indicators">
+            <h2>Indicators</h2>
+            <label><input type="checkbox" id="ema"> EMA</label>
+            <label><input type="checkbox" id="sma"> SMA</label>
+            <label><input type="checkbox" id="rsi"> RSI</label>
+            <label><input type="checkbox" id="macd"> MACD</label>
+        </section>
+    </main>
+
+    <footer>
+        <p>Powered by Pi Network | TradingPiView</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

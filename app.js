@@ -1,4 +1,6 @@
-const symbol = "btcusdt"; // lowercase symbol for Binance API & WS
+// Elements
+const symbolSelect = document.getElementById("symbol-select");
+const timeframeSelect = document.getElementById("timeframe-select");
 const priceEl = document.getElementById("live-price");
 const priceChangeEl = document.getElementById("price-change");
 const alertMsgEl = document.getElementById("alert-msg");
@@ -8,49 +10,64 @@ const setAlertsBtn = document.getElementById("set-alerts-btn");
 const bidsEl = document.getElementById("bids");
 const asksEl = document.getElementById("asks");
 const tradesListEl = document.getElementById("trades-list");
+const symbolDisplay = document.getElementById("symbol");
+
+let currentSymbol = symbolSelect.value;
+let currentTimeframe = timeframeSelect.value;
 
 let currentPrice = 0;
 let lastPrice = 0;
 let takeProfit = null;
 let stopLoss = null;
 
-// WebSocket streams for real-time data
-const wsTicker = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@ticker`);
-const wsDepth = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@depth20@100ms`);
-const wsTrades = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@trade`);
+let wsTicker, wsDepth, wsTrades;
+let tradingViewWidget = null;
 
-wsTicker.onmessage = event => {
-  const data = JSON.parse(event.data);
-  lastPrice = currentPrice;
-  currentPrice = parseFloat(data.c); // Last price
+// WebSocket setup and management
+function initWebSockets(symbol) {
+  // Close old sockets if any
+  if (wsTicker) wsTicker.close();
+  if (wsDepth) wsDepth.close();
+  if (wsTrades) wsTrades.close();
 
-  priceEl.textContent = `$${currentPrice.toFixed(2)}`;
+  wsTicker = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@ticker`);
+  wsDepth = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@depth20@100ms`);
+  wsTrades = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@trade`);
 
-  const changePercent = parseFloat(data.P); // Price change %
-  if (changePercent > 0) {
-    priceChangeEl.textContent = `+${changePercent.toFixed(2)}%`;
-    priceChangeEl.className = "positive";
-  } else if (changePercent < 0) {
-    priceChangeEl.textContent = `${changePercent.toFixed(2)}%`;
-    priceChangeEl.className = "negative";
-  } else {
-    priceChangeEl.textContent = "+0.00%";
-    priceChangeEl.className = "neutral";
-  }
+  wsTicker.onmessage = event => {
+    const data = JSON.parse(event.data);
+    lastPrice = currentPrice;
+    currentPrice = parseFloat(data.c); // Last price
 
-  checkAlerts();
-};
+    priceEl.textContent = `$${currentPrice.toFixed(2)}`;
 
-wsDepth.onmessage = event => {
-  const data = JSON.parse(event.data);
-  updateOrderBook(data);
-};
+    const changePercent = parseFloat(data.P); // Price change %
+    if (changePercent > 0) {
+      priceChangeEl.textContent = `+${changePercent.toFixed(2)}%`;
+      priceChangeEl.className = "positive";
+    } else if (changePercent < 0) {
+      priceChangeEl.textContent = `${changePercent.toFixed(2)}%`;
+      priceChangeEl.className = "negative";
+    } else {
+      priceChangeEl.textContent = "+0.00%";
+      priceChangeEl.className = "neutral";
+    }
 
-wsTrades.onmessage = event => {
-  const data = JSON.parse(event.data);
-  updateTrades(data);
-};
+    checkAlerts();
+  };
 
+  wsDepth.onmessage = event => {
+    const data = JSON.parse(event.data);
+    updateOrderBook(data);
+  };
+
+  wsTrades.onmessage = event => {
+    const data = JSON.parse(event.data);
+    updateTrades(data);
+  };
+}
+
+// Update order book UI
 function updateOrderBook(data) {
   // bids and asks arrays: [price, qty]
   const bids = data.bids.slice(0, 10);
@@ -72,8 +89,8 @@ function updateOrderBook(data) {
   });
 }
 
+// Update recent trades UI
 function updateTrades(data) {
-  // data: {p: price, q: quantity, m: isBuyerMaker}
   const el = document.createElement("li");
   el.textContent = `${parseFloat(data.p).toFixed(2)} | ${parseFloat(data.q).toFixed(4)}`;
   el.className = data.m ? "trade-sell" : "trade-buy";
@@ -86,20 +103,7 @@ function updateTrades(data) {
   }
 }
 
-setAlertsBtn.addEventListener("click", () => {
-  takeProfit = parseFloat(takeProfitInput.value);
-  stopLoss = parseFloat(stopLossInput.value);
-  alertMsgEl.textContent = "";
-
-  if (takeProfit && currentPrice >= takeProfit) {
-    alertMsgEl.textContent = `🚨 Take Profit hit! Current price is $${currentPrice.toFixed(2)}`;
-    alertMsgEl.style.color = "#2ea043";
-  } else if (stopLoss && currentPrice <= stopLoss) {
-    alertMsgEl.textContent = `🚨 Stop Loss hit! Current price is $${currentPrice.toFixed(2)}`;
-    alertMsgEl.style.color = "#f85149";
-  }
-});
-
+// Alert checks for TP/SL
 function checkAlerts() {
   if (takeProfit && currentPrice >= takeProfit) {
     alertMsgEl.textContent = `🚨 Take Profit hit! Current price is $${currentPrice.toFixed(2)}`;
@@ -111,3 +115,59 @@ function checkAlerts() {
     alertMsgEl.textContent = "";
   }
 }
+
+// Set alerts event
+setAlertsBtn.addEventListener("click", () => {
+  takeProfit = parseFloat(takeProfitInput.value) || null;
+  stopLoss = parseFloat(stopLossInput.value) || null;
+  alertMsgEl.textContent = "";
+
+  checkAlerts();
+});
+
+// TradingView chart loader
+function loadTradingViewChart(symbol, interval) {
+  if (tradingViewWidget) {
+    tradingViewWidget.remove();
+    tradingViewWidget = null;
+  }
+  tradingViewWidget = new TradingView.widget({
+    width: "100%",
+    height: 400,
+    symbol: symbol.toUpperCase(),
+    interval: interval,
+    timezone: "Etc/UTC",
+    theme: "dark",
+    style: "1",
+    locale: "en",
+    toolbar_bg: "#131722",
+    enable_publishing: false,
+    allow_symbol_change: false,
+    container_id: "chart",
+  });
+}
+
+// Symbol or timeframe change handlers
+symbolSelect.addEventListener("change", () => {
+  currentSymbol = symbolSelect.value;
+  symbolDisplay.textContent = currentSymbol.toUpperCase().replace("USDT", "/USDT");
+  initWebSockets(currentSymbol);
+  loadTradingViewChart(currentSymbol, currentTimeframe);
+});
+
+timeframeSelect.addEventListener("change", () => {
+  currentTimeframe = timeframeSelect.value;
+  loadTradingViewChart(currentSymbol, currentTimeframe);
+});
+
+// Wallet connect placeholder
+document.getElementById("wallet-connect-btn").addEventListener("click", () => {
+  alert("Wallet connect coming soon! (MetaMask, WalletConnect, Pi Wallet, etc.)");
+});
+
+// Initialize on load
+window.addEventListener("load", () => {
+  symbolDisplay.textContent = currentSymbol.toUpperCase().replace("USDT", "/USDT");
+  initWebSockets(currentSymbol);
+  loadTradingViewChart(currentSymbol, currentTimeframe);
+});

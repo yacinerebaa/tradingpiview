@@ -5,45 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradingPiView</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+    <!-- TradingView Widget Script -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-    <header>
-        <h1>📈 TradingPiView</h1>
-        <div id="price-container">
-            <span id="asset-name">Pi</span>: 
-            <span id="asset-price">$0.00</span>
-        </div>
-        <button id="login-btn">🔑 Sign in with Pi Wallet</button>
-    </header>
 
-    <main>
-        <div id="timeframes">
-            <button data-timeframe="1m">1m</button>
-            <button data-timeframe="5m">5m</button>
-            <button data-timeframe="15m">15m</button>
-            <button data-timeframe="1h">1h</button>
-            <button data-timeframe="4h">4h</button>
-            <button data-timeframe="1d">1D</button>
-            <button data-timeframe="1w">1W</button>
-            <button data-timeframe="1M">1M</button>
-        </div>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>TradingPiView</h1>
+        <button id="login-btn">Login</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
         
-        <div id="chart"></div>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Assets</h2>
+            <ul id="asset-list">
+                <li>Pi <span id="asset-price">Loading...</span></li>
+                <li>BTC</li>
+                <li>ETH</li>
+                <li>BNB</li>
+                <li>XRP</li>
+                <li>SOL</li>
+                <li>ADA</li>
+                <li>DOGE</li>
+            </ul>
+        </div>
 
-        <section id="indicators">
-            <h2>Indicators</h2>
-            <label><input type="checkbox" id="ema"> EMA</label>
-            <label><input type="checkbox" id="sma"> SMA</label>
-            <label><input type="checkbox" id="rsi"> RSI</label>
-            <label><input type="checkbox" id="macd"> MACD</label>
-        </section>
-    </main>
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div id="chart"></div>
+            <div id="timeframes">
+                <button>1m</button>
+                <button>5m</button>
+                <button>15m</button>
+                <button>1h</button>
+                <button>4h</button>
+                <button>1d</button>
+            </div>
+        </div>
 
-    <footer>
-        <p>Powered by Pi Network | TradingPiView</p>
-    </footer>
+    </div>
 
+    <!-- App Script -->
     <script src="app.js"></script>
 </body>
 </html>

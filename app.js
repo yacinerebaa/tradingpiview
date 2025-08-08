@@ -1,62 +1,113 @@
-// ======== Live Pi Price Update ========
-async function fetchPiPrice() {
-    try {
-        // Example API — Replace with real Pi price API when listed
-        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
-        const data = await res.json();
-        
-        // Fake conversion just for demo
-        const piPrice = (data.price / 10000).toFixed(4); 
-        document.getElementById("asset-price").textContent = `$${piPrice}`;
-    } catch (err) {
-        console.error("Error fetching Pi price:", err);
-        document.getElementById("asset-price").textContent = "N/A";
-    }
+const symbol = "btcusdt"; // lowercase symbol for Binance API & WS
+const priceEl = document.getElementById("live-price");
+const priceChangeEl = document.getElementById("price-change");
+const alertMsgEl = document.getElementById("alert-msg");
+const takeProfitInput = document.getElementById("take-profit");
+const stopLossInput = document.getElementById("stop-loss");
+const setAlertsBtn = document.getElementById("set-alerts-btn");
+const bidsEl = document.getElementById("bids");
+const asksEl = document.getElementById("asks");
+const tradesListEl = document.getElementById("trades-list");
+
+let currentPrice = 0;
+let lastPrice = 0;
+let takeProfit = null;
+let stopLoss = null;
+
+// WebSocket streams for real-time data
+const wsTicker = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@ticker`);
+const wsDepth = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@depth20@100ms`);
+const wsTrades = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@trade`);
+
+wsTicker.onmessage = event => {
+  const data = JSON.parse(event.data);
+  lastPrice = currentPrice;
+  currentPrice = parseFloat(data.c); // Last price
+
+  priceEl.textContent = `$${currentPrice.toFixed(2)}`;
+
+  const changePercent = parseFloat(data.P); // Price change %
+  if (changePercent > 0) {
+    priceChangeEl.textContent = `+${changePercent.toFixed(2)}%`;
+    priceChangeEl.className = "positive";
+  } else if (changePercent < 0) {
+    priceChangeEl.textContent = `${changePercent.toFixed(2)}%`;
+    priceChangeEl.className = "negative";
+  } else {
+    priceChangeEl.textContent = "+0.00%";
+    priceChangeEl.className = "neutral";
+  }
+
+  checkAlerts();
+};
+
+wsDepth.onmessage = event => {
+  const data = JSON.parse(event.data);
+  updateOrderBook(data);
+};
+
+wsTrades.onmessage = event => {
+  const data = JSON.parse(event.data);
+  updateTrades(data);
+};
+
+function updateOrderBook(data) {
+  // bids and asks arrays: [price, qty]
+  const bids = data.bids.slice(0, 10);
+  const asks = data.asks.slice(0, 10);
+
+  bidsEl.innerHTML = "";
+  asksEl.innerHTML = "";
+
+  bids.forEach(([price, qty]) => {
+    const el = document.createElement("div");
+    el.innerHTML = `<span class="price">${parseFloat(price).toFixed(2)}</span> | ${parseFloat(qty).toFixed(4)}`;
+    bidsEl.appendChild(el);
+  });
+
+  asks.forEach(([price, qty]) => {
+    const el = document.createElement("div");
+    el.innerHTML = `<span class="price">${parseFloat(price).toFixed(2)}</span> | ${parseFloat(qty).toFixed(4)}`;
+    asksEl.appendChild(el);
+  });
 }
 
-// Auto-refresh every 2 seconds
-setInterval(fetchPiPrice, 2000);
-fetchPiPrice();
+function updateTrades(data) {
+  // data: {p: price, q: quantity, m: isBuyerMaker}
+  const el = document.createElement("li");
+  el.textContent = `${parseFloat(data.p).toFixed(2)} | ${parseFloat(data.q).toFixed(4)}`;
+  el.className = data.m ? "trade-sell" : "trade-buy";
 
-// ======== TradingView Chart ========
-function loadTradingViewChart(symbol = "BTCUSDT") {
-    new TradingView.widget({
-        "width": "100%",
-        "height": "100%",
-        "symbol": symbol,
-        "interval": "1",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#131722",
-        "enable_publishing": false,
-        "allow_symbol_change": true,
-        "container_id": "chart"
-    });
+  tradesListEl.prepend(el);
+
+  // Keep max 50 trades
+  if (tradesListEl.children.length > 50) {
+    tradesListEl.removeChild(tradesListEl.lastChild);
+  }
 }
-loadTradingViewChart();
 
-// ======== Timeframe Buttons ========
-document.querySelectorAll(".timeframes button").forEach(btn => {
-    btn.addEventListener("click", () => {
-        alert(`Timeframe changed to ${btn.textContent}`);
-    });
+setAlertsBtn.addEventListener("click", () => {
+  takeProfit = parseFloat(takeProfitInput.value);
+  stopLoss = parseFloat(stopLossInput.value);
+  alertMsgEl.textContent = "";
+
+  if (takeProfit && currentPrice >= takeProfit) {
+    alertMsgEl.textContent = `🚨 Take Profit hit! Current price is $${currentPrice.toFixed(2)}`;
+    alertMsgEl.style.color = "#2ea043";
+  } else if (stopLoss && currentPrice <= stopLoss) {
+    alertMsgEl.textContent = `🚨 Stop Loss hit! Current price is $${currentPrice.toFixed(2)}`;
+    alertMsgEl.style.color = "#f85149";
+  }
 });
 
-// ======== Auth Buttons ========
-document.getElementById("login-btn").addEventListener("click", () => {
-    alert("Login feature coming soon (Web3 Wallet Connect)");
-    document.getElementById("logout-btn").style.display = "inline-block";
-    document.getElementById("login-btn").style.display = "none";
-    document.getElementById("signup-btn").style.display = "none";
-});
-document.getElementById("signup-btn").addEventListener("click", () => {
-    alert("Sign up coming soon");
-});
-document.getElementById("logout-btn").addEventListener("click", () => {
-    alert("Logged out");
-    document.getElementById("logout-btn").style.display = "none";
-    document.getElementById("login-btn").style.display = "inline-block";
-    document.getElementById("signup-btn").style.display = "inline-block";
-});
+function checkAlerts() {
+  if (takeProfit && currentPrice >= takeProfit) {
+    alertMsgEl.textContent = `🚨 Take Profit hit! Current price is $${currentPrice.toFixed(2)}`;
+    alertMsgEl.style.color = "#2ea043";
+  } else if (stopLoss && currentPrice <= stopLoss) {
+    alertMsgEl.textContent = `🚨 Stop Loss hit! Current price is $${currentPrice.toFixed(2)}`;
+    alertMsgEl.style.color = "#f85149";
+  } else {
+    alertMsgEl.textContent = "";
+  }
+}

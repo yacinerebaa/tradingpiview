@@ -1,90 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TradingPiView - Advanced Web3 Crypto Dashboard</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://s3.tradingview.com/tv.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TradingPiView - Pro Web3 Crypto Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-<header>
-  <div class="logo">
-    <img src="logo.png" alt="TradingPiView Logo" />
-    <h1>TradingPiView</h1>
-  </div>
-  <nav>
-    <button id="wallet-connect-btn">Connect Wallet</button>
-  </nav>
-</header>
-
-<main>
-  <section class="price-section">
-    <h2>Live Price: <span id="symbol">BTC/USDT</span></h2>
-    <div class="price-display">
-      <span id="live-price">$0.00</span>
-      <span id="price-change" class="neutral">+0.00%</span>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="TradingPiView Logo" />
+      <h1>TradingPiView</h1>
     </div>
-
-    <div class="tp-sl-inputs">
-      <label>
-        Take Profit ($):
-        <input type="number" id="take-profit" step="0.01" placeholder="e.g. 30000" />
-      </label>
-      <label>
-        Stop Loss ($):
-        <input type="number" id="stop-loss" step="0.01" placeholder="e.g. 28000" />
-      </label>
-      <button id="set-alerts-btn">Set Alerts</button>
-    </div>
-
-    <p id="alert-msg"></p>
-  </section>
-
-  <section class="order-book-section">
-    <h3>Order Book Depth</h3>
-    <div id="order-book">
-      <div id="bids"></div>
-      <div id="asks"></div>
-    </div>
-  </section>
-
-  <section class="trades-section">
-    <h3>Recent Trades</h3>
-    <ul id="trades-list"></ul>
-  </section>
-
-  <section class="chart-section">
-    <div id="chart" style="height: 400px;"></div>
-    <div class="chart-controls">
-      <label>
-        Symbol:
-        <select id="symbol-select">
-          <option value="btcusdt" selected>BTC/USDT</option>
-          <option value="ethusdt">ETH/USDT</option>
-          <option value="bnbusdt">BNB/USDT</option>
-          <!-- Add more symbols here -->
+    <nav>
+      <div id="lang-select-wrapper">
+        <select id="lang-select" aria-label="Select Language">
+          <option value="auto">🌐 Auto</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="ar">العربية</option>
         </select>
-      </label>
-      <label>
-        Timeframe:
-        <select id="timeframe-select">
-          <option value="1">1m</option>
-          <option value="5" selected>5m</option>
-          <option value="15">15m</option>
-          <option value="60">1h</option>
-          <option value="240">4h</option>
-          <option value="D">1d</option>
-        </select>
-      </label>
-    </div>
-  </section>
-</main>
+      </div>
+      <button id="profile-btn" aria-label="User profile">
+        <img src="user-icon.svg" alt="User Icon" />
+      </button>
+      <div id="profile-menu" class="hidden">
+        <button id="logout-btn" class="menu-btn">Log Out</button>
+        <button id="settings-btn" class="menu-btn">Settings</button>
+        <button id="help-btn" class="menu-btn">Help</button>
+      </div>
+    </nav>
+  </header>
 
-<footer>
-  <p>© 2025 TradingPiView | Real-Time Dashboard | Web3 Ready</p>
-</footer>
+  <main>
+    <section class="assets-list">
+      <h2 data-i18n="assets_list">Assets</h2>
+      <ul id="assets-ul" role="list">
+        <!-- JS populates this -->
+      </ul>
+    </section>
 
-<script src="app.js"></script>
+    <section class="dashboard">
+      <div class="price-header">
+        <h2 id="asset-name">PI / USDT</h2>
+        <div id="price-change" class="neutral">+0.00%</div>
+      </div>
+      <div id="live-price" class="live-price">$0.00</div>
+
+      <div class="alerts-panel">
+        <input
+          id="tp-input"
+          type="number"
+          placeholder="Take Profit ($)"
+          aria-label="Take Profit Price"
+        />
+        <input
+          id="sl-input"
+          type="number"
+          placeholder="Stop Loss ($)"
+          aria-label="Stop Loss Price"
+        />
+        <button id="set-alerts-btn">Set Alerts</button>
+      </div>
+
+      <section class="order-book-trades">
+        <article class="order-book" aria-label="Order Book">
+          <h3 data-i18n="order_book">Order Book</h3>
+          <div id="order-book-bids" class="order-book-side bids"></div>
+          <div id="order-book-asks" class="order-book-side asks"></div>
+        </article>
+        <article class="recent-trades" aria-label="Recent Trades">
+          <h3 data-i18n="recent_trades">Recent Trades</h3>
+          <ul id="trades-list"></ul>
+        </article>
+      </section>
+
+      <section class="chart-container">
+        <div id="chart"></div>
+        <div class="chart-controls">
+          <label for="timeframe-select" data-i18n="timeframe">Timeframe</label>
+          <select id="timeframe-select" aria-label="Select Timeframe">
+            <option value="1">1m</option>
+            <option value="5" selected>5m</option>
+            <option value="15">15m</option>
+            <option value="60">1h</option>
+            <option value="240">4h</option>
+            <option value="D">1d</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="pi-info" aria-label="Pi Network Information">
+        <h3>Pi Network Info</h3>
+        <ul>
+          <li>Market Cap: <span id="pi-marketcap">Loading...</span></li>
+          <li>Circulating Supply: <span id="pi-circulating">Loading...</span></li>
+          <li>Total Supply: <span id="pi-total">Loading...</span></li>
+          <li>Market Rank: <span id="pi-rank">Loading...</span></li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 TradingPiView | Web3 Crypto Dashboard | Made for Pioneers & Traders</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>

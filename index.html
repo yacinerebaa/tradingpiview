@@ -1,112 +1,107 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TradingPiView - Pro Web3 Crypto Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://s3.tradingview.com/tv.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TradingPiView - Pi Network Live Dashboard</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="logo.png" alt="TradingPiView Logo" />
-      <h1>TradingPiView</h1>
+<header>
+  <div class="logo">
+    <img src="logo.png" alt="TradingPiView Logo" />
+    <h1>TradingPiView</h1>
+  </div>
+  <nav>
+    <button id="login-btn">Log In</button>
+    <button id="signup-btn">Sign Up</button>
+    <button id="logout-btn" style="display:none;">Log Out</button>
+    <a href="#about-pi" class="nav-link" id="about-pi-link">About Pi Network</a>
+  </nav>
+</header>
+
+<main>
+  <section class="price-section">
+    <h2>Live Pi Price & Market Data</h2>
+    <p id="pi-price" class="price">$0.0000</p>
+    <div class="market-info">
+      <div><strong>Market Cap:</strong> $<span id="market-cap">0</span></div>
+      <div><strong>24h Volume:</strong> $<span id="volume">0</span></div>
+      <div><strong>Circulating Supply:</strong> <span id="circ-supply">0</span> PI</div>
+      <div><strong>Total Supply:</strong> <span id="total-supply">0</span> PI</div>
     </div>
-    <nav>
-      <div id="lang-select-wrapper">
-        <select id="lang-select" aria-label="Select Language">
-          <option value="auto">🌐 Auto</option>
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-          <option value="ar">العربية</option>
-        </select>
-      </div>
-      <button id="profile-btn" aria-label="User profile">
-        <img src="user-icon.svg" alt="User Icon" />
-      </button>
-      <div id="profile-menu" class="hidden">
-        <button id="logout-btn" class="menu-btn">Log Out</button>
-        <button id="settings-btn" class="menu-btn">Settings</button>
-        <button id="help-btn" class="menu-btn">Help</button>
-      </div>
-    </nav>
-  </header>
+  </section>
 
-  <main>
-    <section class="assets-list">
-      <h2 data-i18n="assets_list">Assets</h2>
-      <ul id="assets-ul" role="list">
-        <!-- JS populates this -->
+  <section class="chart-section">
+    <div id="chart"></div>
+  </section>
+
+  <section class="timeframes">
+    <button>1m</button>
+    <button>5m</button>
+    <button>15m</button>
+    <button>1h</button>
+    <button>4h</button>
+    <button>1d</button>
+  </section>
+
+  <section class="orderbook-trades">
+    <div class="orderbook">
+      <h3>Order Book (Gate.io PI/USDT)</h3>
+      <div class="orderbook-container">
+        <table id="bids-table">
+          <thead><tr><th>Price (USDT)</th><th>Amount (PI)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <table id="asks-table">
+          <thead><tr><th>Price (USDT)</th><th>Amount (PI)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="heatmap-bar" id="heatmap-bar"></div>
+    </div>
+
+    <div class="recent-trades">
+      <h3>Recent Trades</h3>
+      <ul id="trades-list"></ul>
+    </div>
+  </section>
+
+  <!-- About Pi Network Section -->
+  <section id="about-pi" class="about-section">
+    <h2>About Pi Network</h2>
+    <article>
+      <h3>What is Pi Network?</h3>
+      <p>Pi Network is a revolutionary cryptocurrency project designed to enable everyone to mine Pi coins on their smartphones with no battery drain or expensive equipment. It aims to democratize crypto by making it accessible for the masses.</p>
+    </article>
+    <article>
+      <h3>History & Development</h3>
+      <p>Founded in 2019 by Stanford PhDs, Pi Network focused on building a secure, scalable blockchain and a strong community. It uses a novel consensus mechanism that leverages social trust.</p>
+    </article>
+    <article>
+      <h3>Goals of Pi Network</h3>
+      <ul>
+        <li>Democratize crypto mining for mass adoption.</li>
+        <li>Enable decentralization through social trust networks.</li>
+        <li>Build a sustainable mobile blockchain economy.</li>
       </ul>
-    </section>
+    </article>
+    <article>
+      <h3>AI Tools and Chatbots</h3>
+      <p>Pi Network integrates AI-powered chatbots for user onboarding, trading signals, and support, along with a developer platform to build AI-enhanced decentralized applications.</p>
+    </article>
+    <article>
+      <h3>Applications & Ecosystem</h3>
+      <p>Pi Wallet, Pi Browser, Pi Apps Marketplace, and upcoming DeFi tools power the expanding Pi Network ecosystem.</p>
+    </article>
+  </section>
+</main>
 
-    <section class="dashboard">
-      <div class="price-header">
-        <h2 id="asset-name">PI / USDT</h2>
-        <div id="price-change" class="neutral">+0.00%</div>
-      </div>
-      <div id="live-price" class="live-price">$0.00</div>
+<footer>
+  <p>© 2025 TradingPiView | Built for Pi Network</p>
+</footer>
 
-      <div class="alerts-panel">
-        <input
-          id="tp-input"
-          type="number"
-          placeholder="Take Profit ($)"
-          aria-label="Take Profit Price"
-        />
-        <input
-          id="sl-input"
-          type="number"
-          placeholder="Stop Loss ($)"
-          aria-label="Stop Loss Price"
-        />
-        <button id="set-alerts-btn">Set Alerts</button>
-      </div>
-
-      <section class="order-book-trades">
-        <article class="order-book" aria-label="Order Book">
-          <h3 data-i18n="order_book">Order Book</h3>
-          <div id="order-book-bids" class="order-book-side bids"></div>
-          <div id="order-book-asks" class="order-book-side asks"></div>
-        </article>
-        <article class="recent-trades" aria-label="Recent Trades">
-          <h3 data-i18n="recent_trades">Recent Trades</h3>
-          <ul id="trades-list"></ul>
-        </article>
-      </section>
-
-      <section class="chart-container">
-        <div id="chart"></div>
-        <div class="chart-controls">
-          <label for="timeframe-select" data-i18n="timeframe">Timeframe</label>
-          <select id="timeframe-select" aria-label="Select Timeframe">
-            <option value="1">1m</option>
-            <option value="5" selected>5m</option>
-            <option value="15">15m</option>
-            <option value="60">1h</option>
-            <option value="240">4h</option>
-            <option value="D">1d</option>
-          </select>
-        </div>
-      </section>
-
-      <section class="pi-info" aria-label="Pi Network Information">
-        <h3>Pi Network Info</h3>
-        <ul>
-          <li>Market Cap: <span id="pi-marketcap">Loading...</span></li>
-          <li>Circulating Supply: <span id="pi-circulating">Loading...</span></li>
-          <li>Total Supply: <span id="pi-total">Loading...</span></li>
-          <li>Market Rank: <span id="pi-rank">Loading...</span></li>
-        </ul>
-      </section>
-    </section>
-  </main>
-
-  <footer>
-    <p>© 2025 TradingPiView | Web3 Crypto Dashboard | Made for Pioneers & Traders</p>
-  </footer>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

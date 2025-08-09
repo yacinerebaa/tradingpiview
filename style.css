@@ -1,3 +1,4 @@
+/* General reset and base styles */
 * {
   box-sizing: border-box;
 }
@@ -75,6 +76,7 @@ main {
 .price-section {
   text-align: center;
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .price-section h2 {
@@ -89,6 +91,16 @@ main {
   font-weight: 700;
   color: #b2fab4;
   user-select: none;
+}
+
+.price-section.loading #pi-price::after {
+  content: " ⏳";
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {opacity: 1;}
+  50% {opacity: 0;}
 }
 
 .market-info {
@@ -136,6 +148,11 @@ main {
 .timeframes button:hover {
   background-color: #4caf50;
   color: #0e121a;
+}
+
+.timeframes button.active {
+  background-color: #388e3c;
+  color: white;
 }
 
 .orderbook-trades {

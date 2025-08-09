@@ -1,6 +1,8 @@
 const COINGECKO_API = "https://api.coingecko.com/api/v3/coins/pi-network?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false";
-const GATEIO_ORDERBOOK_API = "https://api.gate.io/api2/1/orderBook/pi_usdt";
-const GATEIO_TRADES_API = "https://api.gate.io/api2/1/tradeHistory/pi_usdt";
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+
+const GATEIO_ORDERBOOK_API = CORS_PROXY + "https://api.gate.io/api2/1/orderBook/pi_usdt";
+const GATEIO_TRADES_API = CORS_PROXY + "https://api.gate.io/api2/1/tradeHistory/pi_usdt";
 
 const priceElem = document.getElementById("pi-price");
 const marketCapElem = document.getElementById("market-cap");
@@ -72,6 +74,7 @@ function formatNumber(num) {
 async function fetchOrderBook() {
   try {
     const res = await fetch(GATEIO_ORDERBOOK_API);
+    if (!res.ok) throw new Error("Order book fetch failed");
     const data = await res.json();
 
     bidsTableBody.innerHTML = "";
@@ -94,12 +97,15 @@ async function fetchOrderBook() {
     updateHeatmap(bids, asks);
   } catch (e) {
     console.error("Failed to fetch order book:", e);
+    bidsTableBody.innerHTML = "<tr><td colspan='2'>Cannot load bids.</td></tr>";
+    asksTableBody.innerHTML = "<tr><td colspan='2'>Cannot load asks.</td></tr>";
   }
 }
 
 async function fetchRecentTrades() {
   try {
     const res = await fetch(GATEIO_TRADES_API);
+    if (!res.ok) throw new Error("Trades fetch failed");
     const trades = await res.json();
 
     tradesList.innerHTML = "";
@@ -112,7 +118,7 @@ async function fetchRecentTrades() {
     });
   } catch (e) {
     console.error("Failed to fetch recent trades:", e);
-    tradesList.innerHTML = "<li>Error loading recent trades.</li>";
+    tradesList.innerHTML = "<li>Cannot load trades due to CORS or network error.</li>";
   }
 }
 

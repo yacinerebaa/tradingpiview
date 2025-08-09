@@ -17,6 +17,7 @@ let lastPrice = 0;
 
 async function fetchPiMarketData() {
   try {
+    showLoading(true);
     const res = await fetch(COINGECKO_API);
     const data = await res.json();
 
@@ -33,6 +34,13 @@ async function fetchPiMarketData() {
     totalSupplyElem.textContent = formatNumber(totalSupply);
   } catch (e) {
     console.error("Failed to fetch Pi market data:", e);
+    priceElem.textContent = "Error fetching data";
+    marketCapElem.textContent = "-";
+    volumeElem.textContent = "-";
+    circSupplyElem.textContent = "-";
+    totalSupplyElem.textContent = "-";
+  } finally {
+    showLoading(false);
   }
 }
 
@@ -66,11 +74,9 @@ async function fetchOrderBook() {
     const res = await fetch(GATEIO_ORDERBOOK_API);
     const data = await res.json();
 
-    // Clear tables
     bidsTableBody.innerHTML = "";
     asksTableBody.innerHTML = "";
 
-    // Show top 10 bids (highest price)
     const bids = data.bids.slice(0, 10);
     bids.forEach(([price, amount]) => {
       const row = document.createElement("tr");
@@ -78,7 +84,6 @@ async function fetchOrderBook() {
       bidsTableBody.appendChild(row);
     });
 
-    // Show top 10 asks (lowest price)
     const asks = data.asks.slice(0, 10);
     asks.forEach(([price, amount]) => {
       const row = document.createElement("tr");
@@ -107,10 +112,87 @@ async function fetchRecentTrades() {
     });
   } catch (e) {
     console.error("Failed to fetch recent trades:", e);
+    tradesList.innerHTML = "<li>Error loading recent trades.</li>";
   }
 }
 
 function updateHeatmap(bids, asks) {
-  // Calculate total bid and ask volume
-  const totalBid = bids.reduce((acc, bid) => acc + parseFloat(bid[1]), 0);
-  const totalAsk = asks.reduce((acc
+  const totalBid = bids.reduce((sum, [price, amount]) => sum + parseFloat(amount), 0);
+  const totalAsk = asks.reduce((sum, [price, amount]) => sum + parseFloat(amount), 0);
+  const total = totalBid + totalAsk;
+  const bidPercent = total > 0 ? (totalBid / total) * 100 : 50;
+
+  heatmapBar.style.background = `linear-gradient(to right, #4caf50 ${bidPercent}%, #e91e63 ${bidPercent}%)`;
+}
+
+function showLoading(isLoading) {
+  const priceSection = document.querySelector(".price-section");
+  if (isLoading) priceSection.classList.add("loading");
+  else priceSection.classList.remove("loading");
+}
+
+// TradingView Chart Setup
+const timeframes = ["1", "5", "15", "60", "240", "D"];
+const buttons = document.querySelectorAll(".timeframes button");
+let tradingViewWidget;
+
+function loadTradingViewChart(symbol = "PIUSDT", interval = "1") {
+  if (tradingViewWidget) {
+    tradingViewWidget.remove();
+  }
+  tradingViewWidget = new TradingView.widget({
+    width: "100%",
+    height: "100%",
+    symbol: symbol,
+    interval: interval,
+    timezone: "Etc/UTC",
+    theme: "dark",
+    style: "1",
+    locale: "en",
+    toolbar_bg: "#131722",
+    enable_publishing: false,
+    allow_symbol_change: true,
+    container_id: "chart",
+  });
+}
+
+// Initialize chart
+loadTradingViewChart();
+
+buttons.forEach((btn, idx) => {
+  btn.addEventListener("click", () => {
+    loadTradingViewChart("PIUSDT", timeframes[idx]);
+    buttons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+});
+
+// Auth buttons (placeholder)
+document.getElementById("login-btn").addEventListener("click", () => {
+  alert("Login feature coming soon (Web3 Wallet Connect)");
+  document.getElementById("logout-btn").style.display = "inline-block";
+  document.getElementById("login-btn").style.display = "none";
+  document.getElementById("signup-btn").style.display = "none";
+});
+
+document.getElementById("signup-btn").addEventListener("click", () => {
+  alert("Sign up coming soon");
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+  alert("Logged out");
+  document.getElementById("logout-btn").style.display = "none";
+  document.getElementById("login-btn").style.display = "inline-block";
+  document.getElementById("signup-btn").style.display = "inline-block";
+});
+
+// Main refresh function
+function refreshData() {
+  fetchPiMarketData();
+  fetchOrderBook();
+  fetchRecentTrades();
+}
+
+// Initial load + auto-refresh every 2 seconds
+refreshData();
+setInterval(refreshData, 2000);
